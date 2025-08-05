@@ -111,7 +111,7 @@ const GSTCopilot = () => {
   // Generate email template
   const generateEmail = () => {
     const mismatchList = results.mismatches.map(m => 
-      `- ${m?.invoiceId}: ₹${m.amount2b.toLocaleString()} vs ₹${m.amount3b.toLocaleString()} → ₹${Math.abs(m.diff).toLocaleString()} mismatch`
+      `- ${m?.invoiceId || 'N/A'}: ₹${(m?.amount2b || 0).toLocaleString()} vs ₹${(m?.amount3b || 0).toLocaleString()} → ₹${Math.abs(m?.diff || 0).toLocaleString()} mismatch`
     ).join('\n');
     
     return `Subject: GST Invoice Mismatch – Action Needed
@@ -133,7 +133,11 @@ ${firmName}`;
     const firstMismatch = results.mismatches[0];
     const moreText = results.mismatchCount > 1 ? ` and ${results.mismatchCount - 1} more` : '';
     
-    return `Hi ${clientName}! Found ${results.mismatchCount} mismatch(es) in your GST returns (${firstMismatch?.invoiceId} = ₹${Math.abs(firstMismatch.diff).toLocaleString()} diff${moreText}). Please re-upload and let me know once done.`;
+    if (firstMismatch) {
+      return `Hi ${clientName}! Found ${results.mismatchCount} mismatch(es) in your GST returns (${firstMismatch.invoiceId} = ₹${Math.abs(firstMismatch.diff).toLocaleString()} diff${moreText}). Please re-upload and let me know once done.`;
+    } else {
+      return `Hi ${clientName}! Found ${results.mismatchCount} mismatch(es) in your GST returns. Please review and re-upload the corrected invoices.`;
+    }
   };
 
   // Copy to clipboard
@@ -153,7 +157,7 @@ Mismatches Found: ${results.mismatchCount}
 Total Processed: ${results.totalProcessed}
 
 ${results.mismatches.map(m => 
-  `${m?.invoiceId}: ₹${m.amount2b.toLocaleString()} vs ₹${m.amount3b.toLocaleString()} (Diff: ₹${Math.abs(m.diff).toLocaleString()})`
+  `${m?.invoiceId || 'N/A'}: ₹${(m?.amount2b || 0).toLocaleString()} vs ₹${(m?.amount3b || 0).toLocaleString()} (Diff: ₹${Math.abs(m?.diff || 0).toLocaleString()})`
 ).join('\n')}
 
 Email Draft:
